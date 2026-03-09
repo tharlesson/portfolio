@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight,
@@ -138,7 +138,7 @@ const stackGroups = [
   },
 ];
 
-function Pill({ children }: { children: React.ReactNode }) {
+function Pill({ children }) {
   return (
     <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm text-white/80 backdrop-blur">
       {children}
@@ -146,7 +146,7 @@ function Pill({ children }: { children: React.ReactNode }) {
   );
 }
 
-function SectionTitle({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
+function SectionTitle({ eyebrow, title, description }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 34 }}
@@ -162,15 +162,7 @@ function SectionTitle({ eyebrow, title, description }: { eyebrow: string; title:
   );
 }
 
-function Reveal({
-  children,
-  className = "",
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
+function Reveal({ children, className = "", delay = 0 }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 38, scale: 0.985 }}
@@ -184,14 +176,8 @@ function Reveal({
   );
 }
 
-function ParallaxPanel({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  const ref = useRef<HTMLDivElement | null>(null);
+function ParallaxPanel({ children, className = "" }) {
+  const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
