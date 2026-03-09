@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useMemo, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight,
   Award,
@@ -100,6 +100,29 @@ const metrics = [
   { value: "FinOps", label: "Custos, governança e eficiência operacional" },
 ];
 
+const sreSignalCards = [
+  {
+    value: "99.95%",
+    label: "Availability",
+    text: "Disponibilidade como meta de engenharia, não como desejo otimista em reunião.",
+  },
+  {
+    value: "MTTR ↓",
+    label: "Recovery",
+    text: "Recuperação mais rápida com diagnóstico melhor, runbooks claros e menos caos operacional.",
+  },
+  {
+    value: "Deploy Seguro",
+    label: "Release",
+    text: "Entrega com revisão, rollback previsível e menos chance de surpresas mutantes em produção.",
+  },
+  {
+    value: "IaC First",
+    label: "Platform",
+    text: "Infraestrutura versionada, reproduzível e tratada como produto interno da operação.",
+  },
+];
+
 const stackGroups = [
   {
     title: "Cloud e Plataforma",
@@ -115,7 +138,7 @@ const stackGroups = [
   },
 ];
 
-function Pill({ children }) {
+function Pill({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-sm text-white/80 backdrop-blur">
       {children}
@@ -123,22 +146,80 @@ function Pill({ children }) {
   );
 }
 
-function SectionTitle({ eyebrow, title, description }) {
+function SectionTitle({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
   return (
-    <div className="mx-auto max-w-3xl text-center">
+    <motion.div
+      initial={{ opacity: 0, y: 34 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.35 }}
+      transition={{ duration: 0.75 }}
+      className="mx-auto max-w-3xl text-center"
+    >
       <p className="mb-4 text-sm uppercase tracking-[0.3em] text-white/50">{eyebrow}</p>
       <h2 className="text-4xl font-semibold tracking-tight text-white md:text-6xl">{title}</h2>
       <p className="mt-6 text-lg leading-8 text-white/65 md:text-xl">{description}</p>
-    </div>
+    </motion.div>
+  );
+}
+
+function Reveal({
+  children,
+  className = "",
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 38, scale: 0.985 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function ParallaxPanel({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [70, -70]);
+  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0.45, 1, 1, 0.7]);
+
+  return (
+    <motion.div ref={ref} style={{ y, opacity }} className={className}>
+      {children}
+    </motion.div>
   );
 }
 
 export default function PortfolioAppleInspired() {
   const [activeProject, setActiveProject] = useState(0);
   const currentProject = useMemo(() => projects[activeProject], [activeProject]);
+  const { scrollYProgress } = useScroll();
+  const progressScaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
+      <motion.div
+        style={{ scaleX: progressScaleX }}
+        className="fixed left-0 top-0 z-[70] h-[2px] w-full origin-left bg-white/85"
+      />
+
       <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute bottom-[-10rem] left-[-6rem] h-[24rem] w-[24rem] rounded-full bg-white/5 blur-3xl" />
@@ -148,9 +229,10 @@ export default function PortfolioAppleInspired() {
 
       <header className="sticky top-0 z-50 border-b border-white/10 bg-black/55 backdrop-blur-2xl">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-          <a href="#inicio" className="text-sm font-medium tracking-[0.25em] text-white/85 uppercase">
+          <a href="#inicio" className="text-sm font-medium uppercase tracking-[0.25em] text-white/85">
             TS
           </a>
+
           <div className="hidden gap-6 md:flex">
             {sections.map((section) => (
               <a
@@ -162,6 +244,7 @@ export default function PortfolioAppleInspired() {
               </a>
             ))}
           </div>
+
           <a
             href="#contato"
             className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white px-4 py-2 text-sm font-medium text-black transition hover:scale-[1.02]"
@@ -183,6 +266,7 @@ export default function PortfolioAppleInspired() {
               >
                 Tharlesson Souza • Engenheiro SRE • Cloud • DevOps
               </motion.p>
+
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -195,14 +279,18 @@ export default function PortfolioAppleInspired() {
                 <br />
                 Confiabilidade de verdade.
               </motion.h1>
+
               <motion.p
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.75, delay: 0.12 }}
                 className="mt-8 max-w-2xl text-lg leading-8 text-white/65 md:text-xl"
               >
-                Profissional com foco em Cloud Computing, DevOps e Site Reliability Engineering, construindo plataformas mais previsíveis com AWS, infraestrutura como código, automação, governança e eficiência operacional.
+                Profissional com foco em Cloud Computing, DevOps e Site Reliability Engineering,
+                construindo plataformas mais previsíveis com AWS, infraestrutura como código,
+                automação, governança e eficiência operacional.
               </motion.p>
+
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -215,6 +303,7 @@ export default function PortfolioAppleInspired() {
                 <Pill>GitHub Actions</Pill>
                 <Pill>Observabilidade</Pill>
               </motion.div>
+
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -236,14 +325,9 @@ export default function PortfolioAppleInspired() {
               </motion.div>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.15 }}
-              className="relative"
-            >
+            <ParallaxPanel className="relative">
               <div className="absolute -inset-6 rounded-[2rem] bg-white/10 blur-2xl" />
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.06] p-5 shadow-2xl shadow-black/40 backdrop-blur-2xl">
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/6 p-5 shadow-2xl shadow-black/40 backdrop-blur-2xl">
                 <div className="rounded-[1.6rem] border border-white/10 bg-black/60 p-6">
                   <div className="flex items-center justify-between border-b border-white/10 pb-5">
                     <div>
@@ -256,10 +340,7 @@ export default function PortfolioAppleInspired() {
 
                   <div className="mt-6 grid gap-4 sm:grid-cols-2">
                     {metrics.map((metric) => (
-                      <div
-                        key={metric.label}
-                        className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
-                      >
+                      <div key={metric.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
                         <div className="text-2xl font-semibold">{metric.value}</div>
                         <p className="mt-2 text-sm leading-6 text-white/55">{metric.label}</p>
                       </div>
@@ -274,7 +355,7 @@ export default function PortfolioAppleInspired() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </ParallaxPanel>
           </div>
         </section>
 
@@ -306,8 +387,12 @@ export default function PortfolioAppleInspired() {
           <div className="mt-16 grid gap-8 lg:grid-cols-[0.4fr_0.6fr]">
             <div className="space-y-4">
               {projects.map((project, index) => (
-                <button
+                <motion.button
                   key={project.title}
+                  initial={{ opacity: 0, x: -24 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.35 }}
+                  transition={{ duration: 0.45, delay: index * 0.06 }}
                   onClick={() => setActiveProject(index)}
                   className={`w-full rounded-[1.75rem] border p-6 text-left transition ${
                     activeProject === index
@@ -318,15 +403,17 @@ export default function PortfolioAppleInspired() {
                   <p className="text-xs uppercase tracking-[0.25em] text-white/45">{project.eyebrow}</p>
                   <h3 className="mt-3 text-2xl font-semibold tracking-tight">{project.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-white/55">{project.badge}</p>
-                </button>
+                </motion.button>
               ))}
             </div>
 
             <motion.div
               key={currentProject.title}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45 }}
+              initial={{ opacity: 0, y: 28, scale: 0.985 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.25 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
               className="overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/10 to-white/[0.03] p-8 md:p-10"
             >
               <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.25em] text-white/70">
@@ -420,7 +507,7 @@ export default function PortfolioAppleInspired() {
           />
 
           <div className="mt-16 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-10">
+            <Reveal className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-10">
               <p className="text-sm uppercase tracking-[0.3em] text-white/45">Timeline de evolução</p>
               <div className="mt-10 space-y-8">
                 {[
@@ -449,9 +536,9 @@ export default function PortfolioAppleInspired() {
                   </div>
                 ))}
               </div>
-            </div>
+            </Reveal>
 
-            <div className="space-y-5">
+            <Reveal className="space-y-5" delay={0.08}>
               <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/10 to-white/[0.03] p-8">
                 <p className="text-sm uppercase tracking-[0.3em] text-white/45">Resultados que podem entrar aqui</p>
                 <div className="mt-6 space-y-5">
@@ -469,17 +556,34 @@ export default function PortfolioAppleInspired() {
               </div>
 
               <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
-                <p className="text-sm uppercase tracking-[0.3em] text-white/45">Diferencial visual</p>
+                <p className="text-sm uppercase tracking-[0.3em] text-white/45">Sinal acima do ruído</p>
                 <p className="mt-5 text-lg leading-8 text-white/65">
-                  Use frases curtas, grids amplos, muito respiro visual e animações discretas. O truque da Apple não é exagero. É controle.
+                  Em SRE, sofisticação não é excesso. É controle operacional bem exposto. Use poucos elementos, boa hierarquia visual, métricas relevantes e animações discretas. O visual precisa inspirar confiança antes mesmo da leitura completa.
                 </p>
+
+                <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                  {sreSignalCards.map((card, index) => (
+                    <motion.div
+                      key={card.label}
+                      initial={{ opacity: 0, y: 24 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.35 }}
+                      transition={{ duration: 0.45, delay: index * 0.08 }}
+                      className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-5"
+                    >
+                      <p className="text-2xl font-semibold tracking-tight text-white">{card.value}</p>
+                      <p className="mt-2 text-xs uppercase tracking-[0.25em] text-white/45">{card.label}</p>
+                      <p className="mt-3 text-sm leading-6 text-white/60">{card.text}</p>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         <section id="contato" className="mx-auto max-w-7xl px-6 pb-24 pt-12 lg:px-10">
-          <div className="overflow-hidden rounded-[2.2rem] border border-white/10 bg-white/[0.04] p-8 md:p-12">
+          <Reveal className="overflow-hidden rounded-[2.2rem] border border-white/10 bg-white/[0.04] p-8 md:p-12">
             <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
               <div>
                 <p className="text-sm uppercase tracking-[0.3em] text-white/45">Contato</p>
@@ -508,7 +612,7 @@ export default function PortfolioAppleInspired() {
                 </a>
               </div>
             </div>
-          </div>
+          </Reveal>
         </section>
       </main>
     </div>
