@@ -439,7 +439,7 @@ export default function PortfolioAppleInspired() {
           <SectionTitle
             eyebrow="Stack"
             title="Tecnologia organizada em blocos claros."
-            description="Uma boa vitrine técnica não despeja logos no usuário. Ela organiza capacidades por problema resolvido. Bem mais elegante, e menos carnaval de buzzword."
+            description="A stack é apresentada de forma estruturada, organizada por domínio de atuação e capacidade técnica. O objetivo é evidenciar como cada tecnologia contribui para confiabilidade, automação, escalabilidade e eficiência operacional."
           />
 
           <div className="mt-16 grid gap-5 lg:grid-cols-3">
