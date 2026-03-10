@@ -489,7 +489,7 @@ export default function PortfolioAppleInspired() {
           <SectionTitle
             eyebrow="Impacto"
             title="Menos descrição. Mais prova de valor."
-            description="A estética premium funciona melhor quando ela conduz o olhar para dados, resultados e decisões. Seu portfólio precisa parecer produto e argumento ao mesmo tempo."
+            description="O foco aqui está em evidenciar melhorias práticas em confiabilidade, automação, observabilidade e operação, conectando decisões técnicas a impacto real na plataforma."
           />
 
           <div className="mt-16 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
