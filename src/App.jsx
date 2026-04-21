@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight,
@@ -21,42 +21,92 @@ const sections = [
   { id: "contato", label: "Contato" },
 ];
 
+const projectFilters = ["Todos", "IaC", "GitOps", "Observabilidade", "Reliability Tools", "FinOps", "Education"];
+
 const projects = [
   {
-    eyebrow: "AWS Multi-Account",
-    title: "Governança, custos e padronização em ambientes AWS complexos.",
+    category: "IaC",
+    eyebrow: "terraform-modules + atlantis",
+    title: "Cadeia de infraestrutura com módulos reutilizáveis, revisão de risco e apply governado.",
     description:
-      "Projetos focados em organização de contas, tagging, visibilidade de billing, guardrails operacionais e arquitetura preparada para crescer com menos improviso e mais controle.",
+      "Este bloco reúne a espinha dorsal de infraestrutura como código da workspace: import de legado, módulos Terraform, análise de risco em PR e execução controlada via Atlantis.",
     points: [
-      "Estratégias de governança com tags obrigatórias, policies e controles",
-      "Leitura executiva e técnica de custos com FinOps aplicado",
-      "Padronização de ambientes para operação previsível em escala",
+      "Terraform modules, import e CI para validar stacks antes da mudança",
+      "Risk analyzer com SARIF e classificação de blast radius em PRs",
+      "Atlantis como ponte segura entre revisão, plan e apply controlado",
     ],
-    badge: "Cloud Governance",
+    repos: ["terraform-import", "terraform-modules", "terraform-pr-risk-analyzer", "atlantis"],
+    badge: "IaC Governance",
   },
   {
-    eyebrow: "Plataforma de entrega",
-    title: "ECS, Kubernetes, Terraform e CI/CD para deploy seguro e repetível.",
+    category: "GitOps",
+    eyebrow: "argocd + gitops + karpenter",
+    title: "GitOps opinativo para EKS com progressive delivery, platform addons e autoscaling.",
     description:
-      "Casos reais de construção e evolução de pipelines reutilizáveis, infraestrutura como código e plataformas em ECS e Kubernetes, com integração a RDS, Redis, EFS, ALB, GitOps e automações de rollback.",
+      "A trilha GitOps costura Argo CD, Rollouts, Karpenter e observabilidade para mostrar uma plataforma que entrega aplicações com menos atrito e mais visibilidade operacional.",
     points: [
-      "Terraform modular para múltiplos ambientes",
-      "ECS e Kubernetes com esteiras reutilizáveis de entrega",
-      "Deploy previsível com revisão, rollback e menor risco operacional",
+      "Bootstrap da plataforma, root app e promoção dev -> stage -> prod",
+      "AnalysisTemplate, rollback e upgrade readiness no fluxo de plataforma",
+      "Karpenter e monitoring conectados ao golden path GitOps",
     ],
+    repos: ["argocd", "gitops", "karpenter", "kubernetes-upgrade-readiness-analyzer"],
     badge: "Platform Engineering",
   },
   {
-    eyebrow: "Confiabilidade operacional",
-    title: "Observabilidade, troubleshooting e engenharia do dia a dia.",
+    category: "Observabilidade",
+    eyebrow: "observabilidade + slo-factory",
+    title: "Telemetria, SLO e scorecard como base para operar serviços com critério.",
     description:
-      "Uma vitrine de experiências reais em SRE: análise de incidentes, troubleshooting de Redis, RDS e workloads containerizados, além de melhorias contínuas em monitoramento, operação e resiliência.",
+      "Os bundles de SLO, dashboards e scorecards ajudam a sair da conversa abstrata sobre confiabilidade e chegar em artefatos versionáveis e backlog priorizado.",
     points: [
-      "Redis, RDS e ECS analisados com foco em causa raiz",
-      "Runbooks, métricas, logs e automações operacionais",
-      "Confiabilidade tratada como disciplina, não como superstição de produção",
+      "Dashboards e alertas reutilizáveis para plataforma e workloads",
+      "SLO Factory com AnalysisTemplate para Argo Rollouts",
+      "Platform scorecard com badge, tendência e backlog priorizado",
     ],
-    badge: "SRE",
+    repos: ["observabilidade", "slo-factory", "platform-scorecard"],
+    badge: "Observability",
+  },
+  {
+    category: "Reliability Tools",
+    eyebrow: "aws-sre-doctor + incident-timeline-builder",
+    title: "Tooling operacional para diagnosticar, correlacionar evidências e executar resposta segura.",
+    description:
+      "A família de CLIs operacionais foi construída para incidentes reais: bundles de diagnóstico, timeline, runbooks auditáveis e evidências de DR.",
+    points: [
+      "AWS SRE Doctor com incident bundles portáteis e hipóteses priorizadas",
+      "Timeline builder com fatos confirmados, hipóteses e rascunho de postmortem",
+      "Runbook executor com runners guardados, lock e redaction de segredos",
+    ],
+    repos: ["aws-sre-doctor", "incident-timeline-builder", "runbook-executor", "backup-restore-validator"],
+    badge: "Reliability Operations",
+  },
+  {
+    category: "FinOps",
+    eyebrow: "cloud-cost-waste-finder + secrets-drift-detector",
+    title: "Eficiência operacional com visão de custo, drift e risco de configuração entre ambientes.",
+    description:
+      "Este recorte mostra como custo e confiabilidade andam juntos: desperdício cloud, drift de secrets, score de restore e relatórios acionáveis por owner.",
+    points: [
+      "Snapshot comparison com CSV e recorte por owner/cost center",
+      "Secrets drift com score por ambiente e chaves críticas destacadas",
+      "Readiness de backup ajustada por criticidade do workload",
+    ],
+    repos: ["cloud-cost-waste-finder", "secrets-drift-detector", "backup-restore-validator"],
+    badge: "FinOps + Resilience",
+  },
+  {
+    category: "Education",
+    eyebrow: "portfolio + plano_estudos_sre",
+    title: "Narrativa pública, labs e trilhas para aprender SRE construindo repositórios reais.",
+    description:
+      "A camada de visibilidade conecta os projetos técnicos a uma história coerente de aprendizagem, portfólio e referência para estudos guiados por prática.",
+    points: [
+      "Portfolio organizado por categoria e ecossistema funcional",
+      "Plano de estudos amarrado a labs práticos da própria workspace",
+      "Workspace tools e Jira como camada de enablement e governança",
+    ],
+    repos: ["portfolio", "plano_estudos_sre", "workspace-tools", "jira"],
+    badge: "Education + Enablement",
   },
 ];
 
@@ -194,8 +244,19 @@ function ParallaxPanel({ children, className = "" }) {
 }
 
 export default function PortfolioAppleInspired() {
+  const [activeFilter, setActiveFilter] = useState("Todos");
   const [activeProject, setActiveProject] = useState(0);
-  const currentProject = useMemo(() => projects[activeProject], [activeProject]);
+  const filteredProjects = useMemo(
+    () => (activeFilter === "Todos" ? projects : projects.filter((project) => project.category === activeFilter)),
+    [activeFilter],
+  );
+  useEffect(() => {
+    setActiveProject(0);
+  }, [activeFilter]);
+  const currentProject = useMemo(
+    () => filteredProjects[activeProject] ?? filteredProjects[0] ?? projects[0],
+    [activeProject, filteredProjects],
+  );
   const { scrollYProgress } = useScroll();
   const progressScaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
@@ -367,12 +428,28 @@ export default function PortfolioAppleInspired() {
           <SectionTitle
             eyebrow="Projetos"
             title="Casos reais transformados em narrativa visual."
-            description="A proposta aqui é mostrar problemas reais resolvidos com engenharia: governança em AWS, plataformas de deploy, confiabilidade operacional e decisões orientadas por impacto técnico e de negócio."
+            description="Aqui o portfólio deixa de ser genérico e passa a espelhar o ecossistema real da workspace, organizado por categoria para mostrar como as peças se conectam."
           />
 
-          <div className="mt-16 grid gap-8 lg:grid-cols-[0.4fr_0.6fr]">
+          <div className="mt-12 flex flex-wrap justify-center gap-3">
+            {projectFilters.map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`rounded-full border px-4 py-2 text-sm transition ${
+                  activeFilter === filter
+                    ? "border-white/30 bg-white text-black"
+                    : "border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.08]"
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-10 grid gap-8 lg:grid-cols-[0.4fr_0.6fr]">
             <div className="space-y-4">
-              {projects.map((project, index) => (
+              {filteredProjects.map((project, index) => (
                 <motion.button
                   key={project.title}
                   initial={{ opacity: 0, x: -24 }}
@@ -388,7 +465,7 @@ export default function PortfolioAppleInspired() {
                 >
                   <p className="text-xs uppercase tracking-[0.25em] text-white/45">{project.eyebrow}</p>
                   <h3 className="mt-3 text-2xl font-semibold tracking-tight">{project.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-white/55">{project.badge}</p>
+                  <p className="mt-3 text-sm leading-6 text-white/55">{project.category} • {project.badge}</p>
                 </motion.button>
               ))}
             </div>
@@ -410,6 +487,12 @@ export default function PortfolioAppleInspired() {
               </h3>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-white/65">{currentProject.description}</p>
 
+              <div className="mt-6 flex flex-wrap gap-3">
+                {currentProject.repos.map((repo) => (
+                  <Pill key={repo}>{repo}</Pill>
+                ))}
+              </div>
+
               <div className="mt-10 grid gap-4 md:grid-cols-3">
                 {currentProject.points.map((point) => (
                   <div key={point} className="rounded-2xl border border-white/10 bg-black/25 p-5">
@@ -419,14 +502,14 @@ export default function PortfolioAppleInspired() {
               </div>
 
               <div className="mt-12 rounded-[1.75rem] border border-white/10 bg-black/25 p-6">
-                <p className="text-sm text-white/45">Espaço para evidências</p>
+                <p className="text-sm text-white/45">Evidências e próximos artefatos</p>
                 <div className="mt-4 grid gap-4 md:grid-cols-3">
-                  {[1, 2, 3].map((item) => (
+                  {["screenshots", "diagramas", "artefatos html/json"].map((item) => (
                     <div
                       key={item}
                       className="flex aspect-[4/3] items-center justify-center rounded-2xl border border-dashed border-white/15 bg-white/[0.02] text-sm text-white/35"
                     >
-                      Screenshot / gráfico {item}
+                      {item}
                     </div>
                   ))}
                 </div>
