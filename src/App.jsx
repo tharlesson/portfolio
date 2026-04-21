@@ -5,9 +5,7 @@ import {
   Award,
   BarChart3,
   Cloud,
-  Github,
   Layers3,
-  Linkedin,
   Rocket,
   ShieldCheck,
   Terminal,
@@ -187,6 +185,44 @@ const stackGroups = [
     items: ["CloudWatch", "OpenTelemetry", "Prometheus", "Grafana", "Logs", "Runbooks", "SLO/SLI"],
   },
 ];
+
+function GitHubIcon({ className = "h-4 w-4" }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16" className={className} fill="none">
+      <rect x="0.75" y="0.75" width="14.5" height="14.5" rx="3" stroke="currentColor" strokeWidth="1.5" />
+      <text
+        x="8"
+        y="10.3"
+        textAnchor="middle"
+        fontSize="5.2"
+        fontWeight="700"
+        fill="currentColor"
+        fontFamily="ui-sans-serif, system-ui, sans-serif"
+      >
+        GH
+      </text>
+    </svg>
+  );
+}
+
+function LinkedInIcon({ className = "h-4 w-4" }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16" className={className} fill="none">
+      <rect x="0.75" y="0.75" width="14.5" height="14.5" rx="3" stroke="currentColor" strokeWidth="1.5" />
+      <text
+        x="8"
+        y="10.3"
+        textAnchor="middle"
+        fontSize="5.6"
+        fontWeight="700"
+        fill="currentColor"
+        fontFamily="ui-sans-serif, system-ui, sans-serif"
+      >
+        in
+      </text>
+    </svg>
+  );
+}
 
 function Pill({ children }) {
   return (
@@ -671,13 +707,13 @@ export default function PortfolioAppleInspired() {
                   href="https://github.com/tharlesson"
                   className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white px-5 py-3 text-sm font-medium text-black"
                 >
-                  <Github className="h-4 w-4" /> GitHub
+                  <GitHubIcon className="h-4 w-4" /> GitHub
                 </a>
                 <a
                   href="https://www.linkedin.com/in/tharlesson/"
                   className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-medium text-white"
                 >
-                  <Linkedin className="h-4 w-4" /> LinkedIn
+                  <LinkedInIcon className="h-4 w-4" /> LinkedIn
                 </a>
               </div>
             </div>
